@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+
+# AI Hub 데이터셋 (재배포 불가) - 구조 설명(README)만 올림
+data/*
+!data/README.md
+
+# 학습 결과물 (item-dimension-api/app/data/로 복사해서 사용)
+outputs/*
+!outputs/.gitkeep
