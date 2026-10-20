@@ -30,7 +30,7 @@ cam1~3 이미지 (1920x1080)
 | `roi.json` | ① 배경 차분 | cam별로 물체가 놓이는 바닥 영역. 벽·커튼 등 화면 가장자리 변화를 무시 |
 | `product_db.npz` | ② 상품 식별 | 등록 상품 사진의 DINOv2-small 임베딩 (상품당 6장 x 384차원) |
 | `products.json` | ② 상품 식별 → 응답 | 등록 상품 정보: KAN 코드, 상품명, 바코드, **실측 치수(내림차순)** |
-| `holdout.json` | (테스트용) | "처음 보는 물품" 테스트를 위해 일부러 등록하지 않은 상품 목록 |
+| `holdout.json` | (테스트용) | `--holdout N`으로 일부러 등록하지 않은 상품 목록 (기본은 전부 등록이라 빈 목록) |
 | `volume_model.joblib` | ③ 치수 추정 | 물체 영역의 기하 특징 → 치수 3개(w ≥ d ≥ h)를 예측하는 회귀 모델 |
 
 ---
@@ -52,7 +52,7 @@ cam1~3 이미지 (1920x1080)
 | **Validation** 입고물품 (`VS.zip`, `VL.zip`) | 1,014종, 6,049장 → 학습 샘플 1,997개(상품 x shot) | 부피 모델 학습 | `length/width/height` |
 
 - Sample과 Validation은 **겹치는 상품이 없어서**, 부피 모델은 Validation으로 학습하고 Sample로 "처음 보는 물품" 성능을 평가했습니다.
-- 등록 상품 DB는 Sample 40종 중 **35종 등록, 5종 미등록**(`holdout.json`, 테스트용)이 기본값입니다. `--holdout 0`이면 40종 전부 등록합니다.
+- 등록 상품 DB는 Sample **40종 전부 등록**이 기본값입니다. "처음 보는 물품" 동작을 테스트하려면 `--holdout 5`처럼 일부 상품을 빼고 등록합니다 (뺀 목록은 `holdout.json`).
 
 ### 폴더 배치
 
@@ -82,7 +82,7 @@ python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 
 .venv/bin/python scripts/build_background.py     # 1. 배경 + ROI (가장 먼저, 약 10초)
-.venv/bin/python scripts/build_product_db.py     # 2. 등록 상품 DB (약 30초, --holdout 0 이면 전부 등록)
+.venv/bin/python scripts/build_product_db.py     # 2. 등록 상품 DB (약 30초, 40종 전부 등록)
 .venv/bin/python scripts/train_volume_model.py   # 3. 부피 모델 (CPU 8코어 기준 약 1분)
 
 cp outputs/* ../item-dimension-api/app/data/     # 4. API에 반영 (두 레포가 같은 폴더에 있다고 가정) 후 서버 재시작
@@ -108,7 +108,7 @@ cp outputs/* ../item-dimension-api/app/data/     # 4. API에 반영 (두 레포�
 
 ---
 
-## 5. 성능 (Sample 40종 x 2 shot = 80건, 35종 등록 / 5종 미등록)
+## 5. 성능 (Sample 40종 x 2 shot = 80건, 평가 시 35종 등록 / 5종 미등록으로 나눠 측정)
 
 | 항목 | 결과 |
 |---|---|
