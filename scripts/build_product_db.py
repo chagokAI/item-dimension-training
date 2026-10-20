@@ -1,10 +1,11 @@
 """'갖고 있는 물건' 상품 DB 만들기 (Sample 입고 데이터).
 
 상품당 shot 1·2 x cam 1~3 = 6장을 DINOv2-small 임베딩으로 저장하고, 라벨 실측값(내림차순)을 함께 저장한다.
-처음 보는 물건 테스트용으로 --holdout 개 상품은 등록하지 않는다 (목록은 outputs/holdout.json).
+기본은 Sample 40종 전부 등록. 처음 보는 물건을 테스트하려면 --holdout N 으로 N개 상품을 빼고 등록한다
+(뺀 목록은 outputs/holdout.json, 전부 등록이면 빈 목록).
 배경(build_background.py)을 먼저 만들어야 한다.
 
-사용법: python scripts/build_product_db.py [--sample-root data/Sample] [--holdout 5]
+사용법: python scripts/build_product_db.py [--sample-root data/Sample] [--holdout 0]
 """
 import argparse
 import glob
@@ -23,7 +24,7 @@ from core.segment import BackgroundSegmenter
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--sample-root", default=str(SAMPLE_ROOT))
-parser.add_argument("--holdout", type=int, default=5)
+parser.add_argument("--holdout", type=int, default=0)
 parser.add_argument("--seed", type=int, default=0)
 args = parser.parse_args()
 
